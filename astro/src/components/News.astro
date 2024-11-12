@@ -1,0 +1,68 @@
+---
+import { pickThumbnailSrc, pickHref } from "../lib/utils";
+import ActionButton from "./ActionButton.astro";
+
+const {layout} = Astro.props;
+if (layout?.blockType !== "News Module") return;
+
+let headerHtml = layout.header_html || "";
+let actions = layout.actions || [];
+let newsItems = layout.newsItems || [];
+
+export function formatDate(isoDate) {
+	const date = new Date(isoDate);
+
+	const months = [
+		'January', 'February', 'March', 'April', 'May', 'June',
+		'July', 'August', 'September', 'October', 'November', 'December'
+	];
+
+	const month = months[date.getUTCMonth()];
+	const day = date.getUTCDate();
+	const year = date.getUTCFullYear();
+
+	const getOrdinalSuffix = (day) => {
+		if (day > 3 && day < 21) return 'th';
+		switch (day % 10) {
+			case 1:
+				return 'st';
+			case 2:
+				return 'nd';
+			case 3:
+				return 'rd';
+			default:
+				return 'th';
+		}
+	};
+
+	return `${month} ${day}${getOrdinalSuffix(day)}, ${year}`;
+}
+---
+
+<section>
+    <div class="container">
+        <div class="block">
+
+            <Fragment set:html={headerHtml} />
+
+					{actions.map((action) =>
+                  <ActionButton {...action} />)}
+
+            <div class="spacer-sm"></div>
+
+            <div class="news">
+
+							{newsItems.map((item) => (
+                      <a class="news-item" href={pickHref(item.link)} target={(item.link?.newTab) ? "_blank" : "_self"}>
+                          <img src={pickThumbnailSrc(item.media)} alt={item.media?.alt} title={item.media?.title} />
+												{item.publishedDate && <span class="date">{formatDate(item.publishedDate)}</span>}
+                          <p>
+														{item.title}
+                          </p>
+                      </a>
+							))}
+            </div>
+        </div>
+    </div>
+</section>
+

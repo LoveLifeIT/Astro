@@ -1,0 +1,14 @@
+---
+const {settings} = Astro.props;
+const showButtons = !!(settings)
+---
+
+{showButtons &&
+<div class="btns">
+    <a class="download" href={settings?.iosAppLink} target="_blank" title="Download on teh App Store"><img src="/img/app-store.svg" title="Download on the App Store" alt="Download on the App Store" data-show-on-desktop></a>
+    <a class="download" href={settings?.iosAppLink} target="_blank" title="Download on teh App Store"><img src="/img/app-store.svg" title="Download on the App Store" alt="Download on the App Store" data-show-on-ios></a>
+    <a class="download" href={settings?.androidAppLink} target="_blank" title="Get it on Google Play"><img src="/img/play-store.svg" title="Get it on Google Play" alt="Get it on Google Play" data-show-on-desktop></a>
+    <a class="download" href={settings?.androidAppLink} target="_blank" title="Get it on Google Play"><img src="/img/play-store.svg" title="Get it on Google Play" alt="Get it on Google Play" data-show-on-android></a>
+</div>
+	}
+

@@ -1,0 +1,50 @@
+ ---
+import {getLeftNavs} from "../lib/api";
+import {normalizeURL} from '../lib/utils.js';
+const {layout, page} = Astro.props;
+
+if (layout.blockType !== "Legal Module") return;
+
+let leftnav = await getLeftNavs();
+let _leftNav = null;
+
+leftnav.docs.filter((nav) => {
+    if (nav.id === layout.leftNav.value.id){
+        _leftNav = nav.LeftNavItems;
+    }
+})
+
+_leftNav?.map(normalizeURL);
+
+
+---
+
+<main>
+    <section>
+        <div class="container">
+            <div class="block">
+                <h3>{layout?.leftNav.value.title}</h3>
+                <ul class="faq-nav">
+                  {_leftNav?.map((item) => (
+                    <li><a class:list={[ { active: item?.link.reference.value.slug === page?.slug } ]}
+                           href={item.link.reference.value.slug} title={item.link.label}>{item.link.label}</a></li>
+                  ))}
+                </ul>
+
+                <p set:html={layout?.leftNav.value.LeftNavDisclaimer}/>
+
+                {layout?.leftNav.value.LeftNavDisclaimerActionButtonURL && 
+                <p>
+                    <a class="btn btn-outline" href={layout?.leftNav.value.LeftNavDisclaimerActionButtonURL}
+                        title={layout?.leftNav?.value.LeftNavDisclaimerActionButton}>{layout?.leftNav?.value.LeftNavDisclaimerActionButton}</a>
+                </p>
+                }
+            </div>
+
+            <div class="block rich-text">
+                <Fragment set:html={layout.legalCopy_html} />
+                <Fragment set:html={layout.legalCopy2_html} />
+            </div>
+        </div>
+    </section>
+</main>

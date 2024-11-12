@@ -1,0 +1,10 @@
+---
+import {isImage, pickImageSrc} from "../lib/utils";
+const {image, className} = Astro.props;
+
+---
+
+{isImage(image) &&
+  <img srcset={`${image.url} 100w`} sizes="50px" src={image.url} alt={image?.alt} title={image?.title} class={className}/>
+	}
+            

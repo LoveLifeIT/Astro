@@ -1,0 +1,19 @@
+---
+import { resolveColor } from "../lib/utils";
+const {layout} = Astro.props;
+if (layout.blockType !== "Header Module") return;
+
+let tagLine = layout.heroCopy;
+let backgroundStyleHeader = 'background-color: ' + resolveColor(layout?.backgroundColor);
+let textColorHeader = 'color: ' + resolveColor(layout?.heroCopyColor);
+---
+
+<header>
+    <section class="heading" style={backgroundStyleHeader}>
+        <div class="container">
+            <div class="block" style={textColorHeader}>
+                <h1>{tagLine}</h1>
+            </div>
+        </div>
+    </section>
+</header>

@@ -1,0 +1,114 @@
+---
+import {getSettings} from "../lib/api";
+
+import Banner from '../components/Banner.astro';
+import Contact from '../components/Contact.astro';
+import CookieInstaller from '../components/CookieInstaller.astro';
+import Faq from '../components/Faq.astro';
+import FaqTeaser from '../components/FaqTeaser.astro';
+import Footer from '../components/Footer.astro';
+import GalleryCarousel from '../components/GalleryCarousel.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Legal from '../components/Legal.astro';
+import Map from '../components/Map.astro';
+import Menu from '../components/Menu.astro';
+import Nav from '../components/Nav.astro';
+import News from '../components/News.astro';
+import OneColumn from '../components/OneColumn.astro';
+import OurTeam from '../components/OurTeam.astro';
+import OurTeamCarousel from '../components/OurTeamCarousel.astro';
+import Publications from '../components/Publications.astro';
+import Signup from '../components/Signup.astro';
+import SpaMenu from '../components/SpaMenu.astro';
+import TheLoveLifeMethod from '../components/TheLoveLifeMethod.astro';
+import ThreeColumn from '../components/ThreeColumn.astro';
+import TwoColumn from '../components/TwoColumn.astro';
+import Widget from '../components/Widget.astro';
+
+// found out that we can't do multi line conditionals in the layout block below
+//   if we pass in the entire layout "row", then let the components figure out if they should render
+//   there is a return in the first script block of the components if not the right type
+
+let {page} = Astro.props;
+if (!page) {
+	page = {layout: []}
+}
+const settings = await getSettings();
+const selfUrl = Astro?.site?.origin + page?.slug;
+const isSidebar = page?.isSidebar;
+const trackers = settings?.trackingScripts.map(t => t.script) || [];
+const title = page?.meta?.title || page?.title || 'Love.Life';
+const adTheorentActivityId = page?.adTheorentActivityId;
+---
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no, maximum-scale=1.0, user-scalable=yes">
+    <meta name="og:locale" property="og:locale" content="en_US">
+    <meta name="og:type" property="og:type" content="website">
+    <meta name="og:site_name" property="og:site_name" content="Love.Life">
+    <meta name="og:title" property="og:title" content={title}>
+    <meta name="og:site_name" property="og:site_name" content={title}>
+    <meta name="article:publisher" property="article:publisher"
+          content="https://www.facebook.com/love.life.theofficial/">
+    <meta name="og:url" property="og:url" content={selfUrl}>
+    <meta name="article:publisher" property="article:publisher"
+          content="https://www.facebook.com/love.life.theofficial/">
+    <meta name="article:modified_time" property="article:modified_time" content="2024-05-015T20:32:20+00:00">
+    <meta name="og:image" property="og:image" content={page?.meta?.image?.url}>
+    <meta name="og:image:width" property="og:image:width" content={page?.meta?.image?.width}>
+    <meta name="og:image:height" property="og:image:height" content={page?.meta?.image?.height}>
+    <meta name="og:image:type" property="og:image:type" content={page?.meta?.image?.mimeType}>
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="og:description" property="og:description" content={page?.meta?.description}>
+    <meta name="description" content={page?.meta?.description}>
+    <meta name="keywords" content={page?.meta?.description}>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link href="/css/owl.carousel.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/lovelife.css">
+	{settings?.metaTags?.map(meta => (
+          <Fragment set:html={meta.metaTag}/>
+	))}
+    <title>{title}</title>
+</head>
+<body class:list={[{sidebar: isSidebar}]}>
+<Nav/>
+<slot/>
+{page?.layout.map(layout => (
+        <Map layout={layout} page={page} settings={settings}/>
+        <Hero layout={layout} page={page}/>
+        <Header layout={layout} page={page}/>
+        <Contact layout={layout} page={page}/>
+        <Signup layout={layout} page={page}/>
+        <Faq layout={layout} page={page}/>
+        <Legal layout={layout} page={page}/>
+        <Menu layout={layout} page={page}/>
+        <News layout={layout} page={page}/>
+        <OneColumn layout={layout}/>
+        <TwoColumn layout={layout} settings={settings}/>
+        <ThreeColumn layout={layout}/>
+        <OurTeam layout={layout}/>
+        <OurTeamCarousel layout={layout}/>
+        <GalleryCarousel layout={layout}/>
+        <TheLoveLifeMethod layout={layout}/>
+        <Publications layout={layout}/>
+        <SpaMenu layout={layout}/>
+        <FaqTeaser layout={layout}/>
+        <Widget layout={layout}/>
+        <Banner layout={layout}/>
+))}
+<Footer/>
+<CookieInstaller trackers={trackers}/>
+<script is:inline src="/js/jquery-3.7.1.min.js"></script>
+<script is:inline src="/js/owl.carousel.min.js"></script>
+<script is:inline src="/js/lovelife.js"></script>
+<script is:inline define:vars={{adTheorentActivityId}}>
+	triggerAdTheorentActivity(adTheorentActivityId);
+</script>
+</body>
+</html>

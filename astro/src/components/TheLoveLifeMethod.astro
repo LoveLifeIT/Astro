@@ -1,0 +1,36 @@
+---
+import {createSectionStyle, hasContent} from '../lib/utils';
+
+const {layout} = Astro.props;
+if (layout?.blockType !== "The LoveLife Method") return;
+
+let sectionStyle = createSectionStyle(layout)
+let methods = layout?.methods || [];
+---
+
+<section style={sectionStyle}>
+    <div class="container">
+        <div class="block centered" style="color: #fff">
+
+					{hasContent(layout.title_html) &&
+                  <Fragment set:html={layout.title_html}/>
+                  <div class="spacer-lg"></div>
+					}
+
+            <div class="method">
+
+                <div class="method-item">
+                    <img class="method-img" src="img/method.png" alt="The Love.Life Method">
+                </div>
+
+							{methods.map((item) => (
+                      <div class="method-item">
+                          <Fragment set:html={item.method_html}/>
+                          <img class="method-curve" src="img/curve.png" alt="Section Divider">
+                      </div>
+							))}
+
+            </div>
+        </div>
+    </div>
+</section>

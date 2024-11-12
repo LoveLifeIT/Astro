@@ -1,0 +1,151 @@
+---
+let trackers = Astro.props.trackers
+---
+
+<div class="cookie" style="display: none">
+    <div class="cookie-copy">
+        This website uses cookies to enhance user experience and to analyze performance and traffic on our website. We
+        also share information about your use of our site with our social media, advertising and analytics partners.
+    </div>
+    <div class="btns">
+        <a id="deny-cookies" class="btn btn-outline" title="Deny">Deny</a>
+        <a id="accept-cookies" class="btn btn-solid" title="Accept All">Accept All</a>
+    </div>
+</div>
+
+<script is:inline define:vars={{trackers}}>
+
+  function parseScript(scriptString) {
+      try {
+          // Create a temporary element to parse the script string
+          const temp = document.createElement('div');
+          temp.innerHTML = scriptString.trim();
+          const scriptElement = temp.firstChild;
+
+          // Check if it's a valid script element
+          if (scriptElement && scriptElement.tagName === 'SCRIPT') {
+              const src = scriptElement.src;
+              const content = scriptElement.text;
+              const id = scriptElement.id;
+              const async = scriptElement.async;
+              return {src, content, id, async};
+          }
+
+          // If it's not a valid script element, return the original string as it may be executable
+          return {content: scriptString?.trim()}
+      }
+      catch (error) {
+          console.error('Error parsing script', error);
+          return null;
+      }
+  }
+
+  function installScript(scriptData) {
+      try {
+          const script = document.createElement('script');
+
+          if (scriptData.src) {
+              script.src = scriptData.src;
+          } else if (scriptData.content) {
+              script.text = scriptData.content;
+          } else {
+              console.error('Invalid script data: no src or content provided');
+              return null;
+          }
+
+          if (scriptData.id) script.id = scriptData.id;
+          if (scriptData.async) script.async = scriptData.async;
+
+          document.head.appendChild(script);
+
+          console.info('tracker installed');
+      }
+      catch (error) {
+          console.error('Error installing script', error);
+          return null;
+      }
+  }
+
+  function loadScript(originalScript) {
+      try {
+          const scriptData = parseScript(originalScript);
+          if (scriptData) {
+              return installScript(scriptData);
+          } else {
+              console.error('Invalid script string provided');
+              return null;
+          }
+      }
+      catch (error) {
+          console.error('Error loading script', error);
+          return null;
+      }
+  }
+
+	function setCookie(name, value, days) {
+		let expires = "";
+		if (days) {
+			const date = new Date();
+			date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+			expires = "; expires=" + date.toUTCString();
+		}
+		document.cookie = name + "=" + (value || "") + expires + "; path=/; SameSite=Lax";
+	}
+
+	function getCookie(name) {
+		const nameEQ = name + "=";
+		const ca = document.cookie.split(';');
+		for (let i = 0; i < ca.length; i++) {
+			let c = ca[i];
+			while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+			if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+		}
+		return null;
+	}
+
+	function installCookies() {
+      for (let tracker of trackers) {
+          loadScript(tracker)
+      }
+  }
+
+	function showCookieElement(show) {
+		const cookieElement = document.querySelector('.cookie');
+		if (!cookieElement) return;
+		cookieElement.style.display = (show) ? 'flex' : 'none';
+	}
+
+	function acceptCookies() {
+		setCookie('cookieConsent', 'accepted', 365 * 10);
+		showCookieElement(false);
+		installCookies();
+	}
+
+	function denyCookies() {
+		setCookie('cookieConsent', 'denied', 30);
+		showCookieElement(false);
+	}
+
+	function checkCookieConsent() {
+		const consent = getCookie('cookieConsent');
+		if (consent === 'denied') {
+			showCookieElement(false);
+		} else if (consent === 'accepted') {
+			showCookieElement(false);
+			installCookies();
+		} else {
+			showCookieElement(true);
+		}
+	}
+
+  function onLoad() {
+    const acceptCookiesButton = document.getElementById('accept-cookies');
+    const denyCookiesButton = document.getElementById('deny-cookies');
+    acceptCookiesButton.addEventListener('click', acceptCookies);
+    denyCookiesButton.addEventListener('click', denyCookies);
+    checkCookieConsent();
+  }
+
+	document.addEventListener('DOMContentLoaded', onLoad);
+
+</script>

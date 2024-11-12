@@ -1,0 +1,13 @@
+---
+import {pickHref, pickTarget} from "../lib/utils.js";
+import ActionButton from "./ActionButton.astro";
+const {actions} = Astro.props;
+
+---
+
+{actions?.length > 0 &&
+<div class="btns">
+{actions?.map(((action) =>
+        <ActionButton {...action} />))}
+</div>
+	}

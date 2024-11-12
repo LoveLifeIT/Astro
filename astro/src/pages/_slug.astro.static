@@ -1,0 +1,18 @@
+---
+import {getPages} from "../lib/api";
+import Layout from '../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+	const pages = await getPages()
+	return pages.docs.map((_page: any) => {
+		return {
+			params: { slug: _page.slug },
+			props: { _page } };
+	});
+}
+
+//@ts-ignore
+const page: any = Astro.props?._page;
+
+---
+{!!(page) && <Layout page={page} />}

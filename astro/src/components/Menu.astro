@@ -1,0 +1,41 @@
+---
+import {createSectionStyle} from '../lib/utils';
+import {normalizeSingleLinkURL} from '../lib/utils.js';
+import ActionButton from "./ActionButton.astro";
+
+const {layout, page} = Astro.props;
+if (layout.blockType !== "Menu Module") return;
+
+let menuHtml: string = layout?.header_html || '';
+
+layout?.actions.map(normalizeSingleLinkURL);
+let sectionStyle = createSectionStyle(layout);
+---
+
+<section style={sectionStyle}>
+    <div class="container">
+        <div class="block">
+
+            <Fragment set:html={menuHtml}></Fragment>
+
+            <table class="table">
+                {layout?.menuRow?.map((row) => (
+                  <tbody>
+                  {row?.details?.map((detail, idx) => (
+                    <tr>
+                        <td>{ (idx === 0) ? row.label: ''}</td>
+                        <td>{detail.description}</td>
+                        <td>{detail.price}</td>
+                    </tr>
+                  ))}
+                  </tbody>
+                ))}
+            </table>
+
+            <div class="btns btn-right">
+                {layout.actions.map((action) => <ActionButton {...action}/>)}
+            </div>
+
+        </div>
+    </div>
+</section>

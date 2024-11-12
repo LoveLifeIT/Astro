@@ -1,0 +1,96 @@
+---
+import {getFaq, getLeftNavs} from "../lib/api";
+
+const {layout, page} = Astro.props;
+if (layout.blockType !== "Faq Module") return;
+
+const leftNavs = await getLeftNavs();
+const faq = await getFaq()
+
+let _leftNav = null;
+
+leftNavs?.docs?.filter((nav) => {
+	if (nav.id === layout?.leftNav?.value?.id) {
+		_leftNav = nav.LeftNavItems;
+	}
+})
+
+
+let filteredFAQ = faq?.docs?.filter(q => q.tags.some(c => c.name == layout.faqTag?.value?.name));
+---
+
+<main data-faq>
+    <section>
+        <div class="container">
+
+            <div class="block">
+
+                <h2>{layout?.leftNav?.value?.title}</h2>
+
+                <ul class="faq-nav">
+									{_leftNav?.map((item) => (
+                          <li>
+                              <a class:list={[{active: item?.link?.reference?.value.slug === page?.slug}]}
+                                 href={item.link.reference?.value?.slug} title={item.link.label}>{item.link.label}</a></li>
+									))}
+                </ul>
+
+                <p set:html={layout?.leftNav?.value.LeftNavDisclaimer}/>
+
+							{layout?.leftNav?.value.LeftNavDisclaimerActionButtonURL &&
+                      <p>
+                          <a class="btn btn-outline" title={layout?.leftNav?.value.LeftNavDisclaimerActionButton}
+                             href={layout?.leftNav?.value.LeftNavDisclaimerActionButtonURL}>{layout?.leftNav?.value.LeftNavDisclaimerActionButton}</a>
+                      </p>
+							}
+
+            </div>
+
+
+            <div class="block">
+                <h3>{layout?.faqHeading}</h3>
+
+                <h4>{page?.title}</h4>
+
+                <div class="faq-list">
+                    {filteredFAQ?.map((item) => (
+                      <div class="faq-item ">
+                          <div class="faq-item--q">
+                              <h3>{item.question}</h3>
+                              <img class="faq-item--chevron" src="/img/chevron.svg" alt="Toggle answer">
+                          </div>
+                          <div class="faq-item--a" style="display: none">
+                              <Fragment set:html={item.answer_html} />
+                          </div>
+                      </div>
+                    ))}
+                </div>
+
+            </div>
+
+
+        </div>
+    </section>
+</main>
+
+<style>
+
+    .child {
+        padding-left: 25px;
+    }
+
+
+</style>
+
+<script is:inline>
+	document.addEventListener('DOMContentLoaded', function () {
+      $('.faq-item--q').click(function () {
+          $(this).closest('.faq-item').toggleClass('active');
+          $(this).siblings('.faq-item--a').slideToggle('fast');
+      });
+      // this is a hack because of a bug with external links in lexical rich text editor where
+      // the target attribute is not being added to the link
+      // if/when this gets fixed in the editor, this code can be removed
+      addTargetToLinks('[data-faq]')
+  })
+</script>

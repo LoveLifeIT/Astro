@@ -1,0 +1,21 @@
+---
+import {createSectionStyle, createBlockStyle, hasBackgroundVideo} from "../lib/utils";
+import ActionButton from "./ActionButton.astro";
+
+const {layout} = Astro.props;
+if (layout?.blockType !== "Banner") return;
+
+let sectionStyle = createSectionStyle(layout)
+
+---
+
+<section class="banner" style={sectionStyle}>
+    <div class="container">
+        <div class="block">
+            <p>{layout.copy}</p>
+            {layout?.actions?.map((action) => (
+                <ActionButton {...action}  />
+            ))}
+        </div>
+    </div>
+</section>

@@ -1,0 +1,18 @@
+---
+import { pickCarouselImageSrc } from "../lib/utils";
+
+const {layout} = Astro.props;
+if (layout?.blockType !== "Gallery Carousel") return;
+
+let slides = layout?.slides || [];
+---
+
+<section>
+    <div class="owl-carousel gallery-carousel">
+        {slides.map((slide) => (
+        <div class="gallery">
+          <img src={pickCarouselImageSrc(slide.image)} alt={slide.image?.alt} title={slide.image?.title}/>
+        </div>
+        ))}
+    </div>
+</section>

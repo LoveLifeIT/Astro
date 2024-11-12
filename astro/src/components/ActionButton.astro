@@ -1,0 +1,17 @@
+---
+import {randomNumber, pickHref, pickTarget} from "../lib/utils";
+const action = Astro.props;
+
+let {adTheorentActivityId} = action
+
+let id: string = randomNumber(100000000000).toString();
+---
+
+<a id={id} class:list={["btn", action.style]} href={pickHref(action)} target={pickTarget(action)}>{action.label}</a>
+
+
+<script is:inline define:vars={{id, adTheorentActivityId}}>
+	document.addEventListener('DOMContentLoaded', function () {
+		document.getElementById(id)?.addEventListener('click', () => triggerAdTheorentActivity(adTheorentActivityId))
+	});
+</script>

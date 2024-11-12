@@ -1,0 +1,21 @@
+---
+import {createSectionStyle, pickHref} from '../lib/utils';
+
+const {layout} = Astro.props;
+if (layout?.blockType !== "Publications") return;
+
+let sectionStyle = createSectionStyle(layout)
+let publications = layout?.publications || [];
+---
+
+<section style={sectionStyle}>
+    <div class="container">
+        <div class="block logos">
+					{publications.map((item) => (
+                  <a href={pickHref(item.link)} target={(item?.link.newTab)} title={item.image?.title}>
+                      <img src={item.image?.url} srcset={`${item.image?.url} 100w`} sizes="50px" alt={item.image?.alt} title={item.image?.title}/>
+                  </a>
+					))}
+        </div>
+    </div>
+</section>

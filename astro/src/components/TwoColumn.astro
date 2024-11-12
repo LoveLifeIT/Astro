@@ -1,0 +1,52 @@
+---
+import {createSectionStyle, createBlockStyle, hasBackgroundVideo} from "../lib/utils";
+import ActionButton from "./ActionButton.astro";
+import AppDownloadButtons from "./AppDownloadButtons.astro";
+import BackgroundVideo from "./BackgroundVideo.astro";
+import Image from "./Image.astro";
+
+const {layout, settings} = Astro.props;
+if (layout?.blockType !== "Two Column") return;
+
+let sectionStyle = createSectionStyle(layout)
+
+let containerClassList: string[] = ["container"];
+if(layout.fullWidth) containerClassList.push('wide');
+
+let columnOne = layout?.columnOne;
+let columnOneStyle: string = createBlockStyle(columnOne, layout);
+let columnOneClassList: string[] = ["block", columnOne?.alignment];
+let columnOneHtml: string = columnOne?.copy_html || '';
+let columnOneActions: any[] = columnOne?.actions || [];
+
+let columnTwo = layout?.columnTwo;
+let columnTwoStyle: string = createBlockStyle(columnTwo, layout);
+let columnTwoClassList: string[] = ["block", columnTwo?.alignment];
+let columnTwoHtml: string = columnTwo?.copy_html || '';
+let columnTwoActions: any[] = columnTwo?.actions || [];
+
+---
+
+<section style={sectionStyle}>
+    {hasBackgroundVideo(layout) && <BackgroundVideo {...layout}/>}
+    <div class:list={containerClassList}>
+        <div class:list={columnOneClassList} style={columnOneStyle}>
+					{hasBackgroundVideo(layout.columnOne) && <BackgroundVideo {...layout.columnOne}/>}
+            <Fragment set:html={columnOneHtml}></Fragment>
+            <Image image={layout.columnOne?.media} />
+            <div class="btns">
+							{columnOneActions.map((action) => <ActionButton {...action}/>)}
+            </div>
+            {columnOne?.includeDownloadButton && <AppDownloadButtons settings={settings} />}
+        </div>
+        <div class:list={columnTwoClassList} style={columnTwoStyle}>
+            {hasBackgroundVideo(layout.columnTwo) && <BackgroundVideo {...layout.columnTwo}/>}
+            <Fragment set:html={columnTwoHtml}></Fragment>
+            <Image image={layout.columnTwo?.media} />
+            <div class="btns">
+							{columnTwoActions.map((action) => <ActionButton {...action}/>)}
+            </div>
+            {columnTwo?.includeDownloadButton && <AppDownloadButtons settings={settings} />}
+        </div>
+    </div>
+</section>

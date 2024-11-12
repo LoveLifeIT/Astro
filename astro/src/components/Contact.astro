@@ -1,0 +1,193 @@
+---
+
+import {randomNumber} from '../lib/utils.js';
+import {createBlockStyle, createSectionStyle} from "../lib/utils";
+
+const { layout } = Astro.props;
+if (layout.blockType !== "Contact Us Module") return;
+
+let buttonId = 'submitBtn'+randomNumber(100000)
+let formId = 'SignupForm'+randomNumber(100000)
+let submitBtnCheckbox = 'submitBtnCheckbox'+randomNumber(100000)
+
+let style = 'justify-content: start;' + createBlockStyle(layout)
+---
+
+<section>
+    <div class="container">
+        <div class="block" style={style}>
+            <Fragment set:html={layout.header_html} />
+        </div>
+        <div class="block">
+            <p class="hidden" style="color: #CC503F" id="formError">An unexpected error has occurred. Please wait a few seconds and try again.</p>
+            <h2 class="hidden" id="formCopySuccess">{layout?.postSubmitCopy || 'Thank you for contacting us.'}</h2>
+            <form class="form" id={formId}>
+                <div class="form-row">
+                    <div class="form-field" id='formFieldFirstName'>
+                        <input class="form-input" id='first_name' placeholder=" " aria-label="First">
+                        <label class="form-label">First</label>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field" id='formFieldLastName'>
+                        <input class="form-input" id='last_name' placeholder=" " aria-label="Last">
+                        <label class="form-label">Last</label>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-field" id='formFieldEmail'>
+                        <input class="form-input" id='email' placeholder=" " aria-label="Email">
+                        <label class="form-label">Email</label>
+                    </div>
+                </div>
+                <div class="form-row ">
+                    <div class="form-field">
+                        <input class="form-input" id='company' placeholder=" " aria-label="Company Name">
+                        <label class="form-label">Company Name</label>
+                    </div>
+                </div>
+                <div class="form-row textarea ">
+                    <div class="form-field " id='formFieldMessage'>
+                        <textarea class="form-input" rows="4" id='message' placeholder=" " aria-label="Your Message"></textarea>
+                        <label class="form-label">Your Message</label>
+                    </div>
+                </div>
+                <div class="form-row checkbox">
+                    <div class="form-field">
+                        <label class="check">
+                            <input type="checkbox" value="true" id={submitBtnCheckbox} >
+                            <span class="check-mark"></span>
+                            <span class="check-copy">I authorize Love.Life to send me email updates.</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <input class="btn btn-primary" id={buttonId} type="submit" value="Send" aria-label="Send" />
+                </div>
+            </form>
+
+        </div>
+    </div>
+</section>
+
+
+<script define:vars={{ buttonId, formId, submitBtnCheckbox }}>
+
+    let contactFormBtn = document.querySelector("#"+buttonId)
+
+    let contactSubmit = (event) => {
+
+        event.preventDefault();
+
+        contactFormBtn.removeEventListener("click", contactSubmit);
+        
+        let _form = document.querySelector("#"+formId);
+
+        let formObj  = {};
+        formObj.first_name = _form.querySelector("#first_name"); 
+        formObj.last_name = _form.querySelector("#last_name"); 
+        formObj.email = _form.querySelector("#email"); 
+        formObj.company = _form.querySelector("#company"); 
+        formObj.message = _form.querySelector("#message"); 
+
+        let postObject = {};
+
+        postObject.b_bd2b7c32674adfc6fe730d103_3f4094400d = '';
+        postObject.subscribe = 'Subscribe'
+            postObject._ = ''; 
+
+
+        postObject.FNAME = formObj.first_name.value;
+        postObject.LNAME = formObj.last_name.value;
+        postObject.EMAIL = formObj.email.value;
+        postObject.MMERGE5 = formObj.company.value;
+        postObject.MMERGE6 = formObj.message.value;
+
+        if (submitBtnCheckboxState) {
+            postObject.MMERGE7 = "true";
+        } else {
+            postObject.MMERGE7 = "false";
+            postObject.subscribe = ""
+        }
+        
+        // error checking
+        let errorCheck = 0;
+        if (postObject.FNAME == "") {
+            document.querySelector("#formFieldFirstName").classList.add('form-field-error');
+            errorCheck = errorCheck + 1;
+        } else {
+            document.querySelector("#formFieldFirstName").classList= ['form-field'];
+        }
+
+        if (postObject.LNAME == "") {
+            document.querySelector("#formFieldLastName").classList.add('form-field-error');
+            errorCheck = errorCheck + 1;
+        } else {
+            document.querySelector("#formFieldLastName").classList= ['form-field'];
+        }
+
+        if (postObject.EMAIL == "") {
+            document.querySelector("#formFieldEmail").classList.add('form-field-error');
+            errorCheck = errorCheck + 1;
+        } else {
+            document.querySelector("#formFieldEmail").classList= ['form-field'];
+        }
+
+        if (formObj.message.value == "") {
+            document.querySelector("#formFieldMessage").classList.add('form-field-error');
+            errorCheck = errorCheck + 1;
+        } else {
+            document.querySelector("#formFieldMessage").classList= ['form-field'];
+        }
+
+        function handleError(error) {
+            console.log("API ERROR", error)
+            document.getElementById("formError").classList.remove('hidden');
+            contactFormBtn.addEventListener("click", contactSubmit);
+        }
+
+        function handleSuccess() {
+            document.querySelector("#formCopySuccess").classList.remove('hidden');
+            document.getElementById("formError").classList.add('hidden');
+            document.getElementById(formId)?.classList?.add('hidden');
+        }
+
+        if (errorCheck == 0) {
+            fetch('https://life.us14.list-manage.com/subscribe/post?u=bd2b7c32674adfc6fe730d103&amp;id=3f4094400d&amp;f_id=00faa1e5f0', {
+                method: 'POST',
+                body: new URLSearchParams(postObject)
+            })
+              .then(handleSuccess)
+              .catch(handleSuccess)    // current form target always throws CORS error, but submission is successful
+
+          } else {
+            contactFormBtn.addEventListener("click", contactSubmit);
+        }
+
+        return false;
+
+    }
+
+    let submitBtnCheckboxState = false;
+
+    function submitBtnCheckboxFunc(event) {
+
+        submitBtnCheckboxState = !submitBtnCheckboxState;
+
+        if (submitBtnCheckboxState){
+            document.getElementById(submitBtnCheckbox).setAttribute('checked', 'checked');
+            document.getElementById(submitBtnCheckbox).classList.add('checkboxChecked');
+        } else {
+            document.getElementById(submitBtnCheckbox).removeAttribute('checked');
+            document.getElementById(submitBtnCheckbox).classList.remove('checkboxChecked');
+        }
+
+    }
+
+    contactFormBtn.addEventListener("click", contactSubmit);
+
+    var submitBtnCheckboxDom = document.querySelector('#'+submitBtnCheckbox)
+    submitBtnCheckboxDom.addEventListener("click", submitBtnCheckboxFunc);
+
+
+</script>

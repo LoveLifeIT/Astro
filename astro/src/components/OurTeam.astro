@@ -1,0 +1,78 @@
+---
+import {randomNumber, pickAvatarSrc, pickThumbnailSrc} from '../lib/utils';
+
+const {layout} = Astro.props;
+if (layout?.blockType !== "Our Team") return;
+
+let teams = layout.teams || [];
+let people = teams.flatMap((team) => team.people) || []
+let id = layout?.id || randomNumber(100000000);
+
+let position = 0;
+---
+
+<section id={`carousel-${id}`}>
+    <div class="container">
+        <div class="block centered">
+            <h1>Our Team</h1>
+
+					{teams.map((team) => (
+
+                  <h2>{team.name}</h2>
+
+                  <div class="team">
+										{team.people.map((person) => (
+                            <a class="team-item" data-index={position++} title={person.name}>
+                                <img src={pickAvatarSrc(person.image)} alt={person.image?.alt} title={person.image?.title}>
+                                <p>{person.title}</p>
+                                <h2>{person.name}</h2>
+                                <div class="btn btn-outline">{(person.nickname) ? `Meet ${person.nickname}` : 'Learn More'}</div>
+                            </a>
+										))}
+                  </div>
+					))}
+
+        </div>
+    </div>
+</section>
+
+<div class="overlay modal-cards" id={`carousel-overlay-${id}`}>
+    <div class="modal-backdrop"></div>
+    <div class="owl-carousel modal-carousel">
+        {people.map((person) => (
+          <div class="modal">
+              <header>
+                  <h2>{person.team?.name}</h2>
+                  <img class="modal-close" src="/img/modal-x.svg" alt="Close Modal" />
+              </header>
+              <section class="scroll">
+                  <main>
+                      <header>
+                          <img class="modal-bio" src={pickThumbnailSrc(person.image)} alt={person.image?.alt} title={person.image?.title} />
+                          <p>{person.title}</p>
+                          <h1>{person.name}</h1>
+                      </header>
+                      <p class="rich-text" set:html={person.bio_html}></p>
+                  </main>
+              </section>
+          </div>
+        ))}
+    </div>
+</div>
+
+<script is:inline define:vars={{id}}>
+
+	// we use the layout id to ensure that multiple carousels can be used on the same page without conflicting
+	const carouselId = `#carousel-${id}`;
+	const overlayId = `#carousel-overlay-${id}`;
+
+	// setup the event handlers to hide/show the modal details
+	document.addEventListener('DOMContentLoaded', function () {
+		document.querySelectorAll(`${carouselId} .team-item`).forEach((card, idx) => {
+        card.addEventListener('click', () => openModal(`${overlayId}`, idx));
+		});
+		document.querySelectorAll(`${overlayId} .modal-close, ${overlayId} .modal-backdrop`).forEach((closeButton) => {
+			closeButton.addEventListener('click', closeModal);
+		});
+	});
+</script>

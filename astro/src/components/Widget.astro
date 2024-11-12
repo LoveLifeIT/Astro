@@ -1,0 +1,22 @@
+---
+import {
+	createSectionStyle, resolveColor, randomNumber, pickHref, isNewTab, hasBackgroundVideo
+} from '../lib/utils';
+import ActionButton from "./ActionButton.astro";
+import BackgroundVideo from "./BackgroundVideo.astro";
+import Image from "./Image.astro";
+
+const {layout} = Astro.props;
+if (layout?.blockType !== "Widget Module") return;
+
+let sectionStyle = createSectionStyle(layout);
+
+---
+
+<section style={sectionStyle}>
+    <div class="container">
+        <div class="block centered">
+            <Fragment set:html={layout?.widget}/>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,51 @@
+---
+import { createSectionStyle, groupFaqsByTag } from "../lib/utils";
+import ActionButton from "./ActionButton.astro";
+
+const {layout, page} = Astro.props;
+if (layout.blockType !== "Faq Teaser") return;
+
+let sectionStyle = createSectionStyle(layout)
+let actions = layout.actions || [];
+let faqs = layout?.faq || [];
+---
+
+<section style={sectionStyle} data-faq>
+    <div class="container">
+        <div class="block" style="justify-content:start">
+            <Fragment set:html={layout.header_html} />
+            <div class="btns">
+							{actions.map((action) =>
+                      <ActionButton {...action} />)}
+            </div>
+        </div>
+        <div class="block">
+            <div class="faq-list">
+							{faqs.map((faq, index) => (
+                      <div class="faq-item">
+                          <div class="faq-item--q">
+                              <h3>{faq.question}</h3>
+                              <img class="faq-item--chevron" src="/img/chevron.svg" alt="Toggle answer">
+                          </div>
+                          <div class="faq-item--a rich-text" style="display: none">
+                              <Fragment set:html={faq.answer_html} />
+                          </div>
+                      </div>
+							))}
+            </div>
+        </div>
+    </div>
+</section>
+
+<script is:inline>
+    document.addEventListener('DOMContentLoaded', function () {
+        $('.faq-item--q').click(function () {
+            $(this).closest('.faq-item').toggleClass('active');
+            $(this).siblings('.faq-item--a').slideToggle('fast');
+        });
+        // this is a hack because of a bug with external links in lexical rich text editor where
+        // the target attribute is not being added to the link
+        // if/when this gets fixed in the editor, this code can be removed
+        addTargetToLinks('[data-faq]')
+    })
+</script>

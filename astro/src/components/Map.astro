@@ -1,0 +1,85 @@
+---
+
+const { layout, settings } = Astro.props;
+if (layout.blockType !== "Map Module") return;
+
+let key = settings.mapsApiKey || "";
+
+---
+
+<section class="block map" id="google-map"></section>
+
+<script define:vars={{key}}>
+
+// map
+
+(g => {
+    var h, a, k, p = "The Google Maps JavaScript API",
+        c = "google",
+        l = "importLibrary",
+        q = "__ib__",
+        m = document,
+        b = window;
+    b = b[c] || (b[c] = {});
+		// @ts-ignore
+    var d = b.maps || (b.maps = {}),
+        r = new Set,
+        e = new URLSearchParams,
+        u = () => h || (h = new Promise(async (f, n) => {
+            await (a = m.createElement("script"));
+            e.set("libraries", [...r] + "");
+            for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
+            e.set("callback", c + ".maps." + q);
+            a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+            d[q] = f;
+            a.onerror = () => h = n(Error(p + " could not load."));
+						// @ts-ignore
+            a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+            m.head.append(a)
+        }));
+    d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
+})({
+    key,
+    v: "weekly",
+    // Use the 'v' parameter to indicate the version to use (weekly, beta, alpha, etc.).
+    // Add other bootstrap parameters as needed, using camel case.
+});
+
+
+// Initialize and add the map
+let map;
+
+async function initMap() {
+    const position = {
+        lat: 33.907274991279266,
+        lng: -118.39403515767232
+    };
+    // Request needed libraries.
+    //@ts-ignore
+    const {Map} = await google.maps.importLibrary("maps");
+    //@ts-ignore
+		const {AdvancedMarkerElement} = await google.maps.importLibrary("marker");
+
+
+    map = new Map(document.getElementById("google-map"), {
+        zoom: 13,
+        center: position,
+        mapId: "ccc5d22e739983a0"
+    });
+
+    const markerImg = document.createElement("img");
+
+    markerImg.src = "/img/marker.svg";
+    markerImg.alt = "love.life map marker";
+
+    const marker = new AdvancedMarkerElement({
+        map: map,
+        position: position,
+        content: markerImg,
+        title: "Love.Life",
+    });
+}
+
+initMap();
+
+</script>

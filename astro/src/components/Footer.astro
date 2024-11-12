@@ -1,0 +1,95 @@
+---
+import { normalizeURL } from '../lib/utils.js';
+import {getFooter} from "../lib/api";
+
+let footer = await getFooter();
+
+footer.Column1.map(normalizeURL);
+footer.Column2.map(normalizeURL);
+
+footer.CopyrightCopy = footer.CopyrightCopy?.replace(new RegExp('\r?\n', 'g'), '<br />');
+footer.LegalCopy = footer.LegalCopy?.replace(new RegExp('\r?\n', 'g'), '<br />');
+
+footer.addressColumn1Copy = footer.addressColumn1Copy?.replace(new RegExp('\r?\n', 'g'), '<br />');
+footer.hoursCopy = footer.hoursCopy?.replace(new RegExp('\r?\n', 'g'), '<br />');
+
+let addressHtml = footer.address_html
+let hoursHtml = footer.hours_html
+let directionsAdTheorentActivityId = footer.adTheorentActivityId;
+
+---
+
+<footer>
+
+    <section>
+        <div class="container">
+            <div class="block">
+                <img src="/img/lovelife-los-angeles.svg" alt="Love.Life Los Angeles">
+            </div>
+            <div class="block" set:html={addressHtml} />
+            <div class="block" set:html={hoursHtml} />
+            <div class="block">
+                <a id="directionsFooterButton" class="btn btn-outline" href={footer?.directionsURL} target="_blank" title="Directions">Directions</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="footer">
+        <div class="container">
+            <div class="block">
+                <h4>{footer.Column1Header}</h4>
+                <ul>
+									{footer.Column1.map((item) => (
+                          <li><a href={item.link.url} title={item.link.label}
+                                 target={(item?.link.newTab !== true) ? '_self' : '_blank'}>{item.link.label}</a></li>
+									))}
+                </ul>
+            </div>
+            <div class="block">
+                <h4>{footer.Column2Header}</h4>
+                <ul>
+									{footer.Column2.map((item) => (
+                          <li><a href={item.link.url} title={item.link.label}
+                                 target={(item?.link.newTab !== true) ? '_self' : '_blank'}>{item.link.label}</a></li>
+									))}
+                </ul>
+            </div>
+            <div class="block">
+                <h4>{footer.Column3Header}</h4>
+                <ul class="social">
+                    <li><a target="_blank" href="https://www.instagram.com/theofficiallove.life/"
+                           title="Love.Life Los Angeles Instagram Gym Holistic Healthcare El Segundo Manhattan Beach South Bay"><img
+                            src="/img/instagram.svg" alt=""></a></li>
+                    <li><a target="_blank" href="https://www.linkedin.com/company/theofficiallovelife/"
+                           title="Love.Life Los Angeles LinkedIn Gym Holistic Healthcare El Segundo Manhattan Beach South Bay"><img
+                            src="/img/linkedin.svg" alt=""></a></li>
+                    <li><a target="_blank" href="https://www.tiktok.com/@theofficiallove.life"
+                           title="Love.Life Los Angeles TikTok Gym Holistic Healthcare El Segundo Manhattan Beach South Bay"><img
+                            src="/img/tiktok.svg" alt=""></a></li>
+                    <li><a target="_blank" href="https://www.facebook.com/love.life.theofficial/"
+                           title="Love.Life Los Angeles Facebook Gym Holistic Healthcare El Segundo Manhattan Beach South Bay"><img
+                            src="/img/facebook.svg" alt=""></a></li>
+                </ul>
+            </div>
+            <div class="block"></div>
+        </div>
+
+        <section class="tight">
+            <div class="container">
+                <div class="block">
+                    <p set:html={footer.CopyrightCopy}></p>
+                    <p class="small" set:html={footer.LegalCopy}></p>
+                </div>
+                <div class="block"></div>
+            </div>
+        </section>
+
+    </section>
+
+</footer>
+
+<script is:inline define:vars={{directionsAdTheorentActivityId}}>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('directionsFooterButton')?.addEventListener('click', () => triggerAdTheorentActivity(directionsAdTheorentActivityId))
+    });
+</script>

@@ -1,0 +1,57 @@
+---
+import {createSectionStyle, createBlockStyle, hasBackgroundVideo} from "../lib/utils";
+import ActionButton from "./ActionButton.astro";
+import BackgroundVideo from "./BackgroundVideo.astro";
+import Image from "./Image.astro";
+
+const {layout} = Astro.props;
+if (layout?.blockType !== "Three Column") return;
+
+let sectionStyle = createSectionStyle(layout)
+
+let containerClassList: string[] = ["container"];
+if(layout.fullWidth) containerClassList.push('wide');
+
+let columnOneStyle: string = createBlockStyle(layout.columnOne, layout);
+let columnOneHtml: string = layout?.columnOne.copy_html || '';
+let columnOneActions: any[] = layout?.columnOne?.actions || [];
+
+let columnTwoStyle: string = createBlockStyle(layout.columnTwo, layout);
+let columnTwoHtml: string = layout.columnTwo?.copy_html || '';
+let columnTwoActions: any[] = layout.columnTwo?.actions || [];
+
+let columnThreeStyle: string = createBlockStyle(layout.columnThree, layout);
+let columnThreeHtml: string = layout.columnThree?.copy_html || '';
+let columnThreeActions: any[] = layout.columnThree?.actions || [];
+
+---
+
+<section style={sectionStyle} class={(layout.fullWidth) ? 'wide': ''}>
+    {hasBackgroundVideo(layout) && <BackgroundVideo {...layout}/>}
+    <div class:list={containerClassList}>
+        <div class="block" style={columnOneStyle}>
+            {hasBackgroundVideo(layout.columnOne) && <BackgroundVideo {...layout.columnOne}/>}
+            <Fragment set:html={columnOneHtml}></Fragment>
+            <Image image={layout.columnOne?.media} />
+            <div class="btns">
+							{columnOneActions.map((action) => <ActionButton {...action} />)}
+            </div>
+        </div>
+        <div class="block" style={columnTwoStyle}>
+            {hasBackgroundVideo(layout.columnTwo) && <BackgroundVideo {...layout.columnTwo}/>}
+            <Fragment set:html={columnTwoHtml}></Fragment>
+            <Image image={layout.columnTwo?.media} />
+            <div class="btns">
+							{columnTwoActions.map((action) => <ActionButton {...action} />)}
+            </div>
+        </div>
+        <div class="block" style={columnThreeStyle}>
+            {hasBackgroundVideo(layout.columnThree) && <BackgroundVideo {...layout.columnThree}/>}
+            <Fragment set:html={columnThreeHtml}></Fragment>
+            <Image image={layout.columnThree?.media} />
+            <div class="btns">
+                {columnThreeActions.map((action) => <ActionButton {...action} />)}
+            </div>
+        </div>
+    </div>
+</section>

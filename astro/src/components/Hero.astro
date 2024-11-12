@@ -1,0 +1,48 @@
+ ---
+
+import {genBackgroundImageStyle, pickImageSrc} from '../lib/utils.js';
+import {resolveColor} from "../lib/utils";
+
+const { layout } = Astro.props;
+if (layout.blockType !== "Hero Module") return;
+
+let backgroundUrl = '';
+let videoDom = '';
+
+if (layout?.backgroundImage?.mimeType?.startsWith('image')) {
+
+    backgroundUrl = genBackgroundImageStyle(pickImageSrc(layout?.backgroundImage));
+
+} else if (layout?.backgroundImage?.mimeType?.startsWith('video')) {
+
+    backgroundUrl = '';
+    videoDom = "<source src='" + layout?.backgroundImage?.url + "' type='" + layout?.backgroundImage.mimeType + "'>"
+
+}
+
+let tagLine = layout.heroCopy;
+
+let backgroundColor = 'background-color: ' + resolveColor(layout?.backgroundColor);
+
+let textColor = 'color: ' + resolveColor(layout?.heroCopyColor);
+
+let backgroundStyle = backgroundUrl + "; " + backgroundColor;
+
+let isInnerPage = !!(layout?.innerPage);
+
+---
+
+
+<header>
+    <section class="hero" style={backgroundStyle}>
+        {(videoDom) &&
+              <video class='background-video' autoplay loop muted playsinline set:html={videoDom}>a</video>
+        }
+        <div class="container">
+            <div class="block" style={textColor}>
+                {(!isInnerPage) && <div class="display">{tagLine}</div>}
+                {(isInnerPage) && <h1>{tagLine}</h1>}
+            </div>
+        </div>
+    </section>
+</header>

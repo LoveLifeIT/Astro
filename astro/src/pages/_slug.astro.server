@@ -1,0 +1,12 @@
+---
+import {getPageBySlug} from "../lib/api";
+import Layout from '../layouts/Layout.astro';
+
+const {slug} = Astro.params;
+if(!slug || slug === 'undefined') return Astro.redirect('/');
+const page = await getPageBySlug("/" + slug);
+if (!page) return Astro.redirect('/');
+
+---
+
+{!!(page) && <Layout page={page} />}

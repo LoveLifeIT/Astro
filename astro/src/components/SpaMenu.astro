@@ -1,0 +1,46 @@
+---
+import {createSectionStyle, resolveColor, randomNumber} from '../lib/utils';
+import ActionButton from "./ActionButton.astro";
+
+const {layout} = Astro.props;
+if (layout?.blockType !== "Spa Menu") return;
+
+let sections = layout?.sections || [];
+let sectionStyle = createSectionStyle(layout)
+---
+
+<section style={sectionStyle}>
+    <div class="container">
+        <div class="block">
+
+					{sections.map((section) => (
+                <span class="anchor"><span class="anchor-target" id={section.anchor}></span></span>
+
+                  <Fragment set:html={section.header_html}/>
+
+                  <table class="table">
+										{section.menuItems.map((item) => (
+                      <tbody>
+                      {item.options.map((option, idx) => (
+                          <tr>
+                              <td>{ (idx === 0) ? item.name: ''}</td>
+                              <td>{option.duration} minutes</td>
+                              <td>${option.price}</td>
+                          </tr>
+                      ))}
+                      </tbody>
+										))}
+                  </table>
+
+                  <div class="btns btn-right">
+										{section.actions.map((action) => <ActionButton {...action}/>)}
+                  </div>
+
+
+            <div class="spacer-sm"></div>
+
+
+          ))}
+        </div>
+    </div>
+</section>

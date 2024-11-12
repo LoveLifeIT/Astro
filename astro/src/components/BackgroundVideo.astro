@@ -1,0 +1,10 @@
+---
+import {isVideo} from "../lib/utils";
+const {backgroundImage} = Astro.props;
+---
+
+{isVideo(backgroundImage) &&
+<video class='background-video' autoplay='autoplay' loop='loop' muted='muted'>
+    <source src={backgroundImage?.url} type={backgroundImage?.mimeType}>
+</video>
+	}

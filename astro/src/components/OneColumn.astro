@@ -1,0 +1,135 @@
+---
+import {
+	createSectionStyle, randomNumber, pickHref, isNewTab, hasBackgroundVideo, pickCarouselImageSrc, hasModal
+} from '../lib/utils';
+import ActionButton from "./ActionButton.astro";
+import ActionButtons from "./ActionButtons.astro";
+import BackgroundVideo from "./BackgroundVideo.astro";
+import Image from "./Image.astro";
+
+const {layout} = Astro.props;
+if (layout?.blockType !== "One Column") return;
+
+let id = layout?.id || randomNumber(100000000);
+let slides = layout?.slides || [];
+let slidesWithModal = slides.filter(hasModal);
+
+let sectionStyle = createSectionStyle(layout);
+if (layout?.height) sectionStyle += `; min-height: ${layout.height}`
+let columnOneClassList: string[] = ["block", layout.alignment];
+let columnOneHtml: string = layout?.copy_html || '';
+let columnOneActions: any[] = layout?.actions || [];
+
+let position = 0;
+function generateId(prefix: string = ''): string {
+	return prefix + randomNumber(100000000).toString();
+}
+---
+
+<section style={sectionStyle}>
+	{hasBackgroundVideo(layout) &&
+          <BackgroundVideo {...layout} />}
+    <div class="container">
+        <div class:list={columnOneClassList}>
+            <Fragment set:html={columnOneHtml} />
+            <Image image={layout.media} />
+            <div class="btns">
+							{columnOneActions.map((action) =>
+                      <ActionButton {...action} />)}
+            </div>
+        </div>
+    </div>
+
+	{slides.length > 0 &&
+          <div class={`owl-carousel card-carousel ${(slides.length < 4) ? 'centered-carousel' : ''}`}
+               id={`carousel-${id}`}>
+						{slides.map((slide, index) => (
+                    <a class="card"
+                       style={{backgroundImage: `url('${pickCarouselImageSrc(slide.image)}')`, color: '#fff'}}
+                       id={generateId()}
+                       data-adtheorent-activity-id={slide.adTheorentActivityId}
+                       data-use={slide.onClick}
+                       data-href={pickHref(slide.link)}
+                       data-tab={isNewTab(slide.link)}
+                       data-index={(hasModal(slide)) ? position++ : -1}
+                       title={slide.title}>
+                        <div class="card-copy">
+													{slide.includeLogo && <img src="/img/lovelife.svg" alt="Love.Life">}
+                            <h2>{slide.title}</h2>
+                        </div>
+                        <img src="/img/arrow-cta.svg" alt="See more detail" />
+                    </a>
+						))}
+          </div>
+          <div class="spacer-lg"></div>
+	}
+</section>
+
+{slidesWithModal.length > 0 &&
+<div class="overlay modal-cards" id={`carousel-overlay-${id}`}>
+    <div class="modal-backdrop"></div>
+    <div class="owl-carousel modal-carousel">
+			{slidesWithModal.map((slide, index) => (
+              <div class="modal">
+                  <header>
+                      <h3>{slide.modal?.header}</h3>
+                      <img class="modal-close" src="/img/modal-x.svg" alt="Close Modal">
+                  </header>
+                  <section class="scroll">
+                      <div class="modal-img">
+												{slide.image && <img class="modal-img--src" srcset={`${pickCarouselImageSrc(slide.image)} 100w`}
+                                             sizes="50px"
+                                             src={pickCarouselImageSrc(slide.image)} alt={slide.image?.alt}
+                                             title={slide.image?.title} />}
+                      </div>
+                      <main>
+                          <header>
+														{slide.includeLogo &&
+                                    <img class="modal-logo" src="/img/lovelife-modal.svg" alt="Love.Life">}
+                              <h1>{slide.title}</h1>
+														{slide.modal?.subTitle && <p>{slide.modal?.subTitle}</p>}
+                          </header>
+												{slide.modal?.copy && <p>{slide.modal?.copy}</p>}
+                      </main>
+                  </section>
+                  <footer>
+                      <ActionButtons actions={slide.modal?.actions} />
+                  </footer>
+              </div>
+			))}
+    </div>
+</div>
+	}
+
+<script is:inline define:vars={{id}}>
+
+	// we use the layout id to ensure that multiple carousels can be used on the same page without conflicting
+	const carouselId = `#carousel-${id}`;
+	const overlayId = `#carousel-overlay-${id}`;
+
+	// setup the event handlers to hide/show the modal details
+	document.addEventListener('DOMContentLoaded', function () {
+
+		document.querySelectorAll(`${carouselId} .card`).forEach((card, idx) => {
+			card.addEventListener('click', (event) => {
+
+				let onClick = event?.target?.dataset?.use;
+				let index = parseInt(event?.target?.dataset?.index) || 0;
+
+				if (onClick === 'useModal') openModal(`${overlayId}`, index)
+				else {
+					let href = event?.target?.dataset?.href;
+					let target = event?.target?.dataset?.tab === "true" ? "_blank" : "_self";
+					if (href) window.open(href, target, 'noopener,noreferrer');
+				}
+
+				triggerAdTheorentActivity(event?.target?.dataset?.adtheorentActivityId);
+			});
+		});
+
+		document.querySelectorAll(`${overlayId} .modal-close, ${overlayId} .modal-backdrop`).forEach((closeButton) => {
+			closeButton.addEventListener('click', closeModal);
+		});
+	});
+
+</script>
